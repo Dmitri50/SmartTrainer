@@ -73,6 +73,15 @@ export default function Form({
                 </div>
             </div>
 
+            <div className='flex flex-wrap -mx-3 mb-6'>
+                <div className='w-full px-3'>
+                    <label htmlFor="goal" className='block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2'>
+                        Enter your workout goal: </label>
+                    <input type="text" id="goal" name="goal" placeholder="e.g., Build muscle, Lose weight, Improve endurance" required className='appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500'>
+                    </input>
+                </div>
+            </div>
+
             {/* community drop down */}
             {children}
 

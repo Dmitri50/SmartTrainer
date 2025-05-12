@@ -4,9 +4,9 @@ import { ZodError, z } from 'zod';
 import { db } from '@/database';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { generateAIWorkoutPlan } from './lib/workoutAI';
 
 export async function createWorkout(prevState: any, formData: FormData) {
-
     let workoutID;
 
     const schema = z.object({
@@ -16,6 +16,7 @@ export async function createWorkout(prevState: any, formData: FormData) {
         inches: z.coerce.number().gte(0).lt(12),
         level: z.string(),
         community: z.coerce.number(),
+        goal: z.string().min(1),
     });
 
     try {
@@ -26,38 +27,30 @@ export async function createWorkout(prevState: any, formData: FormData) {
             inches: formData.get('height-in'),
             level: formData.get('experience-level'),
             community: formData.get('community'),
+            goal: formData.get('goal'),
         });
 
-        const heightInInches = (data.feet * 12) + data.inches;
-
-        let index = 10 * (data.weight / 150) * (heightInInches / 75);
-
-        switch (data.level) {
-            case 'novice':
-                index = index * 1;
-                break;
-            case 'intermediate':
-                index = index * 1.25;
-                break;
-            case 'expert':
-                index = index * 1.5;
-        }
-
-        const { monday, tuesday, wednesday, thursday, friday } = generateWorkout(index);
+        // Generate workout plan using AI
+        const workoutPlan = await generateAIWorkoutPlan({
+            height: data.feet,
+            weight: data.weight,
+            experience: data.level as 'novice' | 'intermediate' | 'advanced',
+            goal: data.goal,
+        });
 
         const workout = await db.workout.create({
             data: {
                 title: data.title,
-                monday: monday,
-                tuesday: tuesday,
-                wednesday: wednesday,
-                thursday: thursday,
-                friday: friday,
+                monday: workoutPlan.monday,
+                tuesday: workoutPlan.tuesday,
+                wednesday: workoutPlan.wednesday,
+                thursday: workoutPlan.thursday,
+                friday: workoutPlan.friday,
             },
         });
 
         if (data.community != 0) {
-            const linkCommunity = await db.community.update({
+            await db.community.update({
                 where: {
                     id: data.community
                 },
@@ -72,7 +65,7 @@ export async function createWorkout(prevState: any, formData: FormData) {
         }
         revalidatePath('/', 'layout');
         workoutID = workout.id;
-
+        redirect(`/workouts/${workoutID}`);
     }
     catch (e) {
         if (e instanceof ZodError) {
@@ -80,15 +73,12 @@ export async function createWorkout(prevState: any, formData: FormData) {
             e.errors.forEach((error) => {
                 errorMessage = errorMessage + error.path[0].toString().toUpperCase() + ": " + error.message + ". ";
             });
-            return { message: errorMessage };
+            return { success: false, error: errorMessage };
         }
         else {
-            return { message: 'Failed to add workout' };
+            return { success: false, error: 'Failed to add workout', details: e };
         }
-
     }
-
-    redirect(`/workouts/${workoutID}`);
 }
 
 function generateWorkout(index: number) {

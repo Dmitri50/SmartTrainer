@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
@@ -38,3 +39,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 =======
 # SmartTrainer
 >>>>>>> e859d2a69c9461aace2fcd93e9417148706d976a
+=======
+# SmartTrainer
+>>>>>>> bd9707d013737fc0abb8d0089bd5bd7ecd6a3052

@@ -1,5 +1,25 @@
 import { getSpecificWorkout } from "@/database/queries";
 
+function formatWorkoutDay(day: string): string {
+    if (!day) return '';
+    
+    // Check if the day might be a stringified JSON object
+    if (day.startsWith('{') || day.startsWith('[')) {
+        try {
+            const parsed = JSON.parse(day);
+            if (typeof parsed === 'object') {
+                // If it's an object, convert it to a formatted string
+                return JSON.stringify(parsed, null, 2);
+            }
+        } catch (e) {
+            // If it's not valid JSON, just return the original string
+        }
+    }
+    
+    // Return the string as is
+    return day;
+}
+
 export default async function SpecificWorkout(
     { params }: {
         params: { id: string }
@@ -29,7 +49,7 @@ export default async function SpecificWorkout(
                                     MONDAY
                                 </p>
                                 <h3 className="text-lg font-semibold text-gray-700">
-                                    {workout.monday}
+                                    {formatWorkoutDay(workout.monday)}
                                 </h3>
                             </div>
                             <div className="flex py-4 gap-6 items-center">
@@ -37,7 +57,7 @@ export default async function SpecificWorkout(
                                     TUESDAY
                                 </p>
                                 <h3 className="text-lg font-semibold text-gray-700">
-                                    {workout.tuesday}
+                                    {formatWorkoutDay(workout.tuesday)}
                                 </h3>
                             </div>
                             <div className="flex py-4 gap-6 items-center">
@@ -45,7 +65,7 @@ export default async function SpecificWorkout(
                                     WEDNESDAY
                                 </p>
                                 <h3 className="text-lg font-semibold text-gray-700">
-                                    {workout.wednesday}
+                                    {formatWorkoutDay(workout.wednesday)}
                                 </h3>
                             </div>
                             <div className="flex py-4 gap-6 items-center">
@@ -53,7 +73,7 @@ export default async function SpecificWorkout(
                                     THURSDAY
                                 </p>
                                 <h3 className="text-lg font-semibold text-gray-700">
-                                    {workout.thursday}
+                                    {formatWorkoutDay(workout.thursday)}
                                 </h3>
                             </div>
                             <div className="flex py-4 gap-6 items-center">
@@ -61,7 +81,7 @@ export default async function SpecificWorkout(
                                     FRIDAY
                                 </p>
                                 <h3 className="text-lg font-semibold text-gray-700">
-                                    {workout.friday}
+                                    {formatWorkoutDay(workout.friday)}
                                 </h3>
                             </div>
 
